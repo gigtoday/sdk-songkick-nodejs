@@ -1,0 +1,30 @@
+{
+    "name": "sdk-songkick-nodejs",
+    "version": "1.0.0",
+    "description": "NODEJS SDK for the songkick api.",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "./node_modules/mocha/bin/mocha test/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/gigtoday/sdk-songkick-nodejs.git"
+    },
+    "keywords": [
+        "songkick"
+    ],
+    "author": {
+        "name": "Mathias Schilling",
+        "email": "m@matchilling.com",
+        "url": "https://www.matchilling.com"
+    },
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/gigtoday/sdk-songkick-nodejs/issues"
+    },
+    "homepage": "https://github.com/gigtoday/sdk-songkick-nodejs#readme",
+    "devDependencies": {
+        "chai": "^3.5.0",
+        "mocha": "^3.0.2"
+    }
+}
