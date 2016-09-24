@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gigtoday/sdk-songkick-nodejs.svg?branch=master)](https://travis-ci.org/gigtoday/sdk-songkick-nodejs)
+
 # Songkick Sdk NodeJS
 
 The [Songkick API](https://www.songkick.com/developer) gives you easy access to the biggest live music database in the world: over 5 million upcoming and past concerts… and growing every day! Easily add concerts to your website or application.
