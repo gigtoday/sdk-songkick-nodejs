@@ -6,13 +6,17 @@ const https       = require('https'),
       url         = require('url');
 
 /**
- * Constructor
- *
+ * @constructor
  * @param {String} apiKey Your songkick api key
+ * @throws {TypeError}
  */
 function Songkick(apiKey) {
     if (!(this instanceof Songkick)) {
         return new Songkick(apiKey)
+    }
+
+    if (! apiKey) {
+        throw new TypeError('Argument "apiKey" must be an non-empty value.');
     }
 
     this.API_KEY        = apiKey;
