@@ -6,8 +6,9 @@ const https       = require('https'),
       url         = require('url');
 
 /**
+ * Create a new Songkick instance
  * @constructor
- * @param {String} apiKey Your songkick api key
+ * @param {String} apiKey - The songkick api key
  * @throws {TypeError}
  */
 function Songkick(apiKey) {
@@ -31,55 +32,46 @@ function Songkick(apiKey) {
 
 /**
  * Call songbird api
- *
- * @param  {String}   method
- * @param  {String}   path
- * @param  {Object}   query
- * @param  {Object}   headers
- * @param  {Function} callback
+ * @param  {String} method
+ * @param  {String} path
+ * @param  {Object} query
+ * @param  {Object} headers
+ * @return {Promise}
  */
-Songkick.prototype.request = function(method, path, query, headers, body, callback) {
-    const requestBody = body ? JSON.stringify(body) : null,
-          options = {
-              hostname : this.HOST_NAME,
-              headers  : headers,
-              path     : url.resolve(this.PATH, path) + ( query ? '?' + querystring.stringify(query) : '' ),
-              port     : this.port,
-              method   : method
-          },
-          req = https.request(options, function(res) {
-              let body = '';
+Songkick.prototype.request = function(method, path, query, headers) {
+    return new Promise(function(resolve, reject) {
 
-              res.setEncoding('utf8')
-              .on('data', function(data) {
-                  body += data;
-              })
-              .on('end', function() {
-                  let acceptedContentTypesForJsonDecoding = [
-                      'application/json', 'application/hal+json', 'application/problem+json'
-                  ];
+        const options = {
+            hostname : this.HOST_NAME,
+            headers  : headers,
+            path     : url.resolve(this.PATH, path) + ( query ? '?' + querystring.stringify(query) : '' ),
+            port     : this.port,
+            method   : method
+        };
 
-                  if (body
-                      && res.headers['content-type']
-                      && acceptedContentTypesForJsonDecoding.indexOf(res.headers['content-type']) > -1
-                  ) {
-                      body = JSON.parse(body);
-                  }
+        const req = https.request(options, function(res) {
+            let body = '';
 
-                  callback(null, body ? body : null, res.statusCode, res.headers);
-              });
-          });
+            res.setEncoding('utf8')
+            .on('data', function(data) {
+                body += data;
+            })
+            .on('end', function() {
+                resolve(body ? body : null);
+            });
+        });
 
-    req.end(requestBody);
+        req.end();
 
-    req.on('error', function(err) {
-        callback(err);
-    });
+        req.on('error', function(err) {
+            reject(err);
+        });
+
+    }.bind(this));
 };
 
 /**
  * Return the current version of the songbird api
- *
  * @return {String}
  */
 Songkick.prototype.getApiVersion = function() {
@@ -88,7 +80,6 @@ Songkick.prototype.getApiVersion = function() {
 
 /**
  * Return the current version of the songbird sdk
- *
  * @return {String}
  */
 Songkick.prototype.getClientVersion = function() {
@@ -97,13 +88,12 @@ Songkick.prototype.getClientVersion = function() {
 
 /**
  * Find upcoming events
- *
  * @see    http://www.songkick.com/developer/event-search
- * @param  {String}   location (sk:<id>, geo:<lat>,<lng>, ip:<ip>, 'clientip', 'nothing')
- * @param  {Object}   options
- * @param  {Function} callback
+ * @param  {String}  location - (sk:<id>, geo:<lat>,<lng>, ip:<ip>, 'clientip', 'nothing')
+ * @param  {Object}  options
+ * @return {Promise}
  */
-Songkick.prototype.findEvents = function(location, options, callback) {
+Songkick.prototype.findEvents = function(location, options) {
     if (typeof options === 'function') {
         callback = options;
     }
@@ -112,7 +102,7 @@ Songkick.prototype.findEvents = function(location, options, callback) {
         options = {};
     }
 
-    this.request(
+    return this.request(
         'get',
         'events.json',
         {
@@ -122,33 +112,22 @@ Songkick.prototype.findEvents = function(location, options, callback) {
             per_page : options.perPage ? options.perPage : 50,
             // min_date : (YYYY-MM-DD)
             // max_date : (YYYY-MM-DD)
-        },
-        null,
-        null,
-        function(err, body, statusCode, headers) {
-            callback(err, body, statusCode, headers)
         }
     );
 };
 
 /**
  * Find past events for an artist.
- *
- * @param  {Integer|String} artistId Songkick or musicbrainz artist id
+ * @param  {Integer|String} artistId - Songkick or musicbrainz artist id
  * @param  {Object} options
- * @param  {Function} callback
- * @return {Object}
+ * @return {Promise}
  */
-Songkick.prototype.findEventsByArtist = function(artistId, options, callback) {
-    if (typeof options === 'function') {
-        callback = options;
-    }
-
-    if (! options || typeof options === 'function') {
+Songkick.prototype.findEventsByArtist = function(artistId, options) {
+    if ('undefined' === typeof options) {
         options = {};
     }
 
-    this.request(
+    return this.request(
         'get',
         Number.isInteger(artistId)
             ? 'artists/' + artistId + '/gigography.json'
@@ -160,24 +139,17 @@ Songkick.prototype.findEventsByArtist = function(artistId, options, callback) {
             // min_date : (YYYY-MM-DD)
             // max_date : (YYYY-MM-DD)
             order    : options.order ? options.order : 'asc'
-        },
-        null,
-        null,
-        function(err, body, statusCode, headers) {
-            callback(err, body, statusCode, headers)
         }
     );
 };
 
 /**
  * A list of artists similar to a given artist, based on our tracking and attendance data.
- *
- * @param  {Integer|String} artistId Songkick or musicbrainz artist id
+ * @param  {Integer} artistId - Songkick artist id
  * @param  {Object} options
- * @param  {Function} callback
- * @return {Object}
+ * @return {Promise}
  */
-Songkick.prototype.findSimilarArtist = function(artistId, options, callback) {
+Songkick.prototype.findSimilarArtist = function(artistId, options) {
     if (typeof options === 'function') {
         callback = options;
     }
@@ -186,59 +158,40 @@ Songkick.prototype.findSimilarArtist = function(artistId, options, callback) {
         options = {};
     }
 
-    this.request(
+    return this.request(
         'get',
         'artists/' + artistId + '/gigography.json',
         {
             apikey   : this.API_KEY,
             page     : options.page ? options.page : 1,
             per_page : options.perPage ? options.perPage : 50
-        },
-        null,
-        null,
-        function(err, body, statusCode, headers) {
-            callback(err, body, statusCode, headers)
         }
     );
 };
 
 /**
  * Detailed event information, including venue information.
- *
  * @param  {Integer} eventId
- * @param  {Function} callback
- * @return {Object}
+ * @return {Promise}
  */
-Songkick.prototype.getEvent = function(eventId, callback) {
-    this.request(
+Songkick.prototype.getEvent = function(eventId) {
+    return this.request(
         'get',
         'events/' + eventId + '.json',
-        { apikey : this.API_KEY },
-        null,
-        null,
-        function(err, body, statusCode, headers) {
-            callback(err, body, statusCode, headers)
-        }
+        { apikey : this.API_KEY }
     );
 };
 
 /**
  * Detailed venue information, complete address, phone number, description, and more.
- *
  * @param  {Integer} venueId
- * @param  {Function} callback
- * @return {Object}
+ * @return {Promise}
  */
-Songkick.prototype.getVenue = function(venueId, callback) {
-    this.request(
+Songkick.prototype.getVenue = function(venueId) {
+    return this.request(
         'get',
         'venues/' + venueId + '.json',
-        { apikey : this.API_KEY },
-        null,
-        null,
-        function(err, body, statusCode, headers) {
-            callback(err, body, statusCode, headers)
-        }
+        { apikey : this.API_KEY }
     );
 };
 

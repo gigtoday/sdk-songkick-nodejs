@@ -1,7 +1,7 @@
 {
-    "name": "sdk-songkick",
+    "name": "songkick-sdk",
     "version": "1.0.0",
-    "description": "NODEJS SDK for the songkick api.",
+    "description": "Songbird SDK written in NodeJS returning promises.",
     "main": "src/index.js",
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha test/"

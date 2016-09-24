@@ -3,7 +3,9 @@
 const assert   = require('assert'),
       Songkick = new require('../src/')(process.env.SONGKICK_API_KEY);
 
-describe('Songkick', function() {
+describe('Songkick Sdk', function() {
+    const TIME_OUT = 0;
+    this.timeout(TIME_OUT);
 
     describe('#getApiVersion', function() {
         it('should return the songkick api version', function() {
@@ -13,66 +15,56 @@ describe('Songkick', function() {
 
     describe('#getClientVersion', function() {
         it('should return the songkick sdk version', function() {
-            assert.equal(Songkick.getClientVersion(), '1.0.0');
+            assert.equal(Songkick.getClientVersion(), require('../package.json').version);
         });
     });
 
     describe('#getEvent', function() {
         it('should return an json object containing event details', function(done) {
-            this.timeout(2500);
+            Songkick.getEvent(27989954).then(JSON.parse).then(function(res) {
+                assert.equal(res.resultsPage.status, 'ok');
 
-            Songkick.getEvent(27989954, function(err, res, statusCode, headers) {
-                assert.equal(err, null);
-
-                done();
+                setTimeout(done, TIME_OUT);
             });
         });
     });
 
     describe('#findEvents', function() {
         it('should return an json object containing search results', function(done) {
-            this.timeout(2500);
+            Songkick.findEvents('sk:24426').then(JSON.parse).then(function(res) {
+                assert.equal(res.resultsPage.status, 'ok');
 
-            Songkick.findEvents('sk:24426', function(err, res, statusCode, headers) {
-                assert.equal(err, null);
-
-                done();
+                setTimeout(done, TIME_OUT);
             });
         });
     });
 
     describe('#findEventsByArtist', function() {
         it('should return an json object containing past events for an artist', function(done) {
-            this.timeout(2500);
+            Songkick.findEventsByArtist(468146).then(JSON.parse).then(function(res) {
+                assert.equal(res.resultsPage.status, 'ok');
 
-            Songkick.findEventsByArtist(468146, function(err, res, statusCode, headers) {
-                assert.equal(err, null);
-
-                done();
+                setTimeout(done, TIME_OUT);
             });
         });
     });
 
     describe('#findSimilarArtist', function() {
         it('should return an json object containing similar artist', function(done) {
-            this.timeout(2500);
+            Songkick.findSimilarArtist(468146).then(JSON.parse).then(function(res) {
+                assert.equal(res.resultsPage.status, 'ok');
 
-            Songkick.findSimilarArtist(468146, function(err, res, statusCode, headers) {
-                assert.equal(err, null);
-
-                done();
+                setTimeout(done, TIME_OUT);
             });
         });
     });
 
     describe('#getVenue', function() {
         it('should return an json object containing venue details', function(done) {
-            this.timeout(4000);
+            Songkick.getVenue(17522).then(JSON.parse).then(function(res) {
+                assert.equal(res.resultsPage.status, 'ok');
 
-            Songkick.getVenue(17522, function(err, res, statusCode, headers) {
-                assert.equal(err, null);
-
-                done();
+                setTimeout(done, TIME_OUT);
             });
         });
     });
