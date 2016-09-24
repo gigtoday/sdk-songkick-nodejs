@@ -36,7 +36,7 @@ describe('Songkick', function() {
             Songkick.findEvents('sk:24426', function(err, res, statusCode, headers) {
                 assert.equal(err, null);
 
-                done(err);
+                done();
             });
         });
     });

@@ -38,23 +38,39 @@ function Songkick(apiKey) {
  * @param  {Object}   headers
  * @param  {Function} callback
  */
-Songkick.prototype.request = function(method, path, query, headers, callback) {
-    const options = {
-            hostname : this.HOST_NAME,
-            path     : path = url.resolve(this.PATH, path)
-                       + '?' + querystring.stringify(query),
-            port     : this.PORT,
-            method   : method
+Songkick.prototype.request = function(method, path, query, headers, body, callback) {
+    const requestBody = body ? JSON.stringify(body) : null,
+          options = {
+              hostname : this.HOST_NAME,
+              headers  : headers,
+              path     : url.resolve(this.PATH, path) + ( query ? '?' + querystring.stringify(query) : '' ),
+              port     : this.port,
+              method   : method
           },
           req = https.request(options, function(res) {
-              res.setEncoding('utf8');
+              let body = '';
 
-              res.on('data', function(data) {
-                  callback(null, data, res.statusCode, res.headers);
+              res.setEncoding('utf8')
+              .on('data', function(data) {
+                  body += data;
+              })
+              .on('end', function() {
+                  let acceptedContentTypesForJsonDecoding = [
+                      'application/json', 'application/hal+json', 'application/problem+json'
+                  ];
+
+                  if (body
+                      && res.headers['content-type']
+                      && acceptedContentTypesForJsonDecoding.indexOf(res.headers['content-type']) > -1
+                  ) {
+                      body = JSON.parse(body);
+                  }
+
+                  callback(null, body ? body : null, res.statusCode, res.headers);
               });
           });
 
-    req.end();
+    req.end(requestBody);
 
     req.on('error', function(err) {
         callback(err);
@@ -107,7 +123,8 @@ Songkick.prototype.findEvents = function(location, options, callback) {
             // min_date : (YYYY-MM-DD)
             // max_date : (YYYY-MM-DD)
         },
-        {},
+        null,
+        null,
         function(err, body, statusCode, headers) {
             callback(err, body, statusCode, headers)
         }
@@ -144,7 +161,8 @@ Songkick.prototype.findEventsByArtist = function(artistId, options, callback) {
             // max_date : (YYYY-MM-DD)
             order    : options.order ? options.order : 'asc'
         },
-        {},
+        null,
+        null,
         function(err, body, statusCode, headers) {
             callback(err, body, statusCode, headers)
         }
@@ -176,7 +194,8 @@ Songkick.prototype.findSimilarArtist = function(artistId, options, callback) {
             page     : options.page ? options.page : 1,
             per_page : options.perPage ? options.perPage : 50
         },
-        {},
+        null,
+        null,
         function(err, body, statusCode, headers) {
             callback(err, body, statusCode, headers)
         }
@@ -196,6 +215,7 @@ Songkick.prototype.getEvent = function(eventId, callback) {
         'events/' + eventId + '.json',
         { apikey : this.API_KEY },
         null,
+        null,
         function(err, body, statusCode, headers) {
             callback(err, body, statusCode, headers)
         }
@@ -214,6 +234,7 @@ Songkick.prototype.getVenue = function(venueId, callback) {
         'get',
         'venues/' + venueId + '.json',
         { apikey : this.API_KEY },
+        null,
         null,
         function(err, body, statusCode, headers) {
             callback(err, body, statusCode, headers)
