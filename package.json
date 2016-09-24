@@ -1,5 +1,5 @@
 {
-    "name": "sdk-songkick-nodejs",
+    "name": "sdk-songkick",
     "version": "1.0.0",
     "description": "NODEJS SDK for the songkick api.",
     "main": "src/index.js",
