@@ -13,7 +13,7 @@ The [Songkick API](https://www.songkick.com/developer) gives you easy access to 
 ```js
 
     // Creating the client
-    const Songkick = new require('sdk-songkick')(process.env.SONGKICK_API_KEY);
+    const Songkick = new require('songkick')(process.env.SONGKICK_API_KEY);
 
     // Get an event by a given id
     Songkick.getEvent(27989954).then(JSON.parse).then(function(res) {
