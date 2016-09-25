@@ -94,37 +94,50 @@ Songkick.prototype.getClientVersion = function() {
  * @return {Promise}
  */
 Songkick.prototype.findEvents = function(location, options) {
-    if (typeof options === 'function') {
-        callback = options;
-    }
+    const queryParams = {
+        apikey   : this.API_KEY,
+        location : location,
+        page     : 1,
+        per_page : 50
+    };
 
-    if (! options || typeof options === 'function') {
-        options = {};
-    }
+    if ('undefined' !== typeof options) {
+        queryParams.page     = options.page ? options.page : queryParams.page;
+        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
 
-    return this.request(
-        'get',
-        'events.json',
-        {
-            apikey   : this.API_KEY,
-            location : location,
-            page     : options.page ? options.page : 1,
-            per_page : options.perPage ? options.perPage : 50,
-            // min_date : (YYYY-MM-DD)
-            // max_date : (YYYY-MM-DD)
+        if (options.minDate && options.maxDate) {
+            queryParams.max_date = options.maxDate;
+            queryParams.min_date = options.minDate;
         }
-    );
+    }
+
+    return this.request('get', 'events.json', queryParams);
 };
 
 /**
  * Find past events for an artist.
+ * @see    http://www.songkick.com/developer/past-events-for-artist
  * @param  {Integer|String} artistId - Songkick or musicbrainz artist id
  * @param  {Object} options
  * @return {Promise}
  */
 Songkick.prototype.findEventsByArtist = function(artistId, options) {
-    if ('undefined' === typeof options) {
-        options = {};
+    const queryParams = {
+        apikey   : this.API_KEY,
+        page     : 1,
+        per_page : 50,
+        order    : 'asc'
+    };
+
+    if ('undefined' !== typeof options) {
+        queryParams.page     = options.page ? options.page : queryParams.page;
+        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
+        queryParams.order    = options.order ? options.order : queryParams.order;
+
+        if (options.minDate && options.maxDate) {
+            queryParams.max_date = options.maxDate;
+            queryParams.min_date = options.minDate;
+        }
     }
 
     return this.request(
@@ -132,40 +145,21 @@ Songkick.prototype.findEventsByArtist = function(artistId, options) {
         Number.isInteger(artistId)
             ? 'artists/' + artistId + '/gigography.json'
             : 'artists/mbid:' + artistId + '/gigography.json',
-        {
-            apikey   : this.API_KEY,
-            page     : options.page ? options.page : 1,
-            per_page : options.perPage ? options.perPage : 50,
-            // min_date : (YYYY-MM-DD)
-            // max_date : (YYYY-MM-DD)
-            order    : options.order ? options.order : 'asc'
-        }
+        queryParams
     );
 };
 
 /**
  * A list of artists similar to a given artist, based on our tracking and attendance data.
+ * @see    http://www.songkick.com/developer/similar-artists
  * @param  {Integer} artistId - Songkick artist id
- * @param  {Object} options
  * @return {Promise}
  */
-Songkick.prototype.findSimilarArtist = function(artistId, options) {
-    if (typeof options === 'function') {
-        callback = options;
-    }
-
-    if (! options || typeof options === 'function') {
-        options = {};
-    }
-
+Songkick.prototype.findSimilarArtist = function(artistId) {
     return this.request(
         'get',
         'artists/' + artistId + '/gigography.json',
-        {
-            apikey   : this.API_KEY,
-            page     : options.page ? options.page : 1,
-            per_page : options.perPage ? options.perPage : 50
-        }
+        { apikey : this.API_KEY }
     );
 };
 
