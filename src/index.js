@@ -87,6 +87,29 @@ Songkick.prototype.getClientVersion = function() {
 };
 
 /**
+ * Search for artists by name using full text search. Sorted by relevancy.
+ * @see    http://www.songkick.com/developer/artist-search
+ * @param  {String} query
+ * @param  {Object} options
+ * @return {Promise}
+ */
+Songkick.prototype.findArtists = function(query, options) {
+    const queryParams = {
+        apikey   : this.API_KEY,
+        query    : query,
+        page     : 1,
+        per_page : 50
+    };
+
+    if ('undefined' !== typeof options) {
+        queryParams.page     = options.page ? options.page : queryParams.page;
+        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
+    }
+
+    return this.request('get', 'search/artists.json', queryParams);
+};
+
+/**
  * Find upcoming events
  * @see    http://www.songkick.com/developer/event-search
  * @param  {String}  location - (sk:<id>, geo:<lat>,<lng>, ip:<ip>, 'clientip', 'nothing')

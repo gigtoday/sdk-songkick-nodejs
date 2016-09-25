@@ -1,6 +1,6 @@
 {
     "name": "songkick",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Songkick SDK written in NodeJS returning promises.",
     "main": "src/index.js",
     "scripts": {
