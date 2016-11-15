@@ -1,72 +1,73 @@
 'use strict';
 
-const assert   = require('assert'),
-      Songkick = new require('../src/')(process.env.SONGKICK_API_KEY);
+const assert = require('assert'),
+      pkg = require('../package.json'),
+      Songkick = require('../src'),
+      songkick = new Songkick(process.env.SONGKICK_API_KEY);
 
-describe('Songkick Sdk', function() {
-    const TIME_OUT = 0;
-    this.timeout(TIME_OUT);
+describe('Songkick Sdk', function () {
+  const TIME_OUT = 0;
+  this.timeout(TIME_OUT);
 
-    describe('#getApiVersion', function() {
-        it('should return the songkick api version', function() {
-            assert.equal(Songkick.getApiVersion(), '3.0');
-        });
+  describe('#getApiVersion', () => {
+    it('should return the songkick api version', () => {
+      assert.equal(songkick.getApiVersion(), '3.0');
     });
+  });
 
-    describe('#getClientVersion', function() {
-        it('should return the songkick sdk version', function() {
-            assert.equal(Songkick.getClientVersion(), require('../package.json').version);
-        });
+  describe('#getClientVersion', () => {
+    it('should return the songkick sdk version', () => {
+      assert.equal(songkick.getClientVersion(), pkg.version);
     });
+  });
 
-    describe('#getEvent', function() {
-        it('should return an json object containing event details', function(done) {
-            Songkick.getEvent(27989954).then(JSON.parse).then(function(res) {
-                assert.equal(res.resultsPage.status, 'ok');
+  describe('#getEvent', () => {
+    it('should return an json object containing event details', (done) => {
+      songkick.getEvent(27989954).then(JSON.parse).then((res) => {
+        assert.equal(res.resultsPage.status, 'ok');
 
-                setTimeout(done, TIME_OUT);
-            });
-        });
+        setTimeout(done, TIME_OUT);
+      });
     });
+  });
 
-    describe('#findEvents', function() {
-        it('should return an json object containing search results', function(done) {
-            Songkick.findEvents('sk:24426').then(JSON.parse).then(function(res) {
-                assert.equal(res.resultsPage.status, 'ok');
+  describe('#findEvents', () => {
+    it('should return an json object containing search results', (done) => {
+      songkick.findEvents('sk:24426').then(JSON.parse).then((res) => {
+        assert.equal(res.resultsPage.status, 'ok');
 
-                setTimeout(done, TIME_OUT);
-            });
-        });
+        setTimeout(done, TIME_OUT);
+      });
     });
+  });
 
-    describe('#findEventsByArtist', function() {
-        it('should return an json object containing past events for an artist', function(done) {
-            Songkick.findEventsByArtist(468146).then(JSON.parse).then(function(res) {
-                assert.equal(res.resultsPage.status, 'ok');
+  describe('#findEventsByArtist', () => {
+    it('should return an json object containing past events for an artist', (done) => {
+      songkick.findEventsByArtist(468146).then(JSON.parse).then((res) => {
+        assert.equal(res.resultsPage.status, 'ok');
 
-                setTimeout(done, TIME_OUT);
-            });
-        });
+        setTimeout(done, TIME_OUT);
+      });
     });
+  });
 
-    describe('#findSimilarArtist', function() {
-        it('should return an json object containing similar artist', function(done) {
-            Songkick.findSimilarArtist(468146).then(JSON.parse).then(function(res) {
-                assert.equal(res.resultsPage.status, 'ok');
+  describe('#findSimilarArtist', () => {
+    it('should return an json object containing similar artist', (done) => {
+      songkick.findSimilarArtist(468146).then(JSON.parse).then((res) => {
+        assert.equal(res.resultsPage.status, 'ok');
 
-                setTimeout(done, TIME_OUT);
-            });
-        });
+        setTimeout(done, TIME_OUT);
+      });
     });
+  });
 
-    describe('#getVenue', function() {
-        it('should return an json object containing venue details', function(done) {
-            Songkick.getVenue(17522).then(JSON.parse).then(function(res) {
-                assert.equal(res.resultsPage.status, 'ok');
+  describe('#getVenue', () => {
+    it('should return an json object containing venue details', (done) => {
+      songkick.getVenue(17522).then(JSON.parse).then((res) => {
+        assert.equal(res.resultsPage.status, 'ok');
 
-                setTimeout(done, TIME_OUT);
-            });
-        });
+        setTimeout(done, TIME_OUT);
+      });
     });
-
+  });
 });

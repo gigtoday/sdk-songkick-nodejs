@@ -1,9 +1,9 @@
 'use strict';
 
-const https       = require('https'),
-      pkg         = require('../package.json'),
+const https = require('https'),
+      pkg = require('../package.json'),
       querystring = require('querystring'),
-      url         = require('url');
+      url = require('url');
 
 /**
  * Create a new Songkick instance
@@ -12,22 +12,20 @@ const https       = require('https'),
  * @throws {TypeError}
  */
 function Songkick(apiKey) {
-    if (!(this instanceof Songkick)) {
-        return new Songkick(apiKey)
-    }
+  if (!(this instanceof Songkick)) {
+    return new Songkick(apiKey);
+  }
 
-    if (! apiKey) {
-        throw new TypeError('Argument "apiKey" must be an non-empty value.');
-    }
+  if (!apiKey) {
+    throw new TypeError('Argument "apiKey" must be an non-empty value.');
+  }
 
-    this.API_KEY        = apiKey;
-
-    this.API_VERSION    = '3.0';
-    this.CLIENT_VERSION = pkg.version;
-
-    this.HOST_NAME      = 'api.songkick.com';
-    this.PATH           = '/api/3.0/';
-    this.PORT           = 443;
+  this.API_KEY = apiKey;
+  this.API_VERSION = '3.0';
+  this.CLIENT_VERSION = pkg.version;
+  this.HOST_NAME = 'api.songkick.com';
+  this.PATH = '/api/3.0/';
+  this.PORT = 443;
 }
 
 /**
@@ -38,52 +36,49 @@ function Songkick(apiKey) {
  * @param  {Object} headers
  * @return {Promise}
  */
-Songkick.prototype.request = function(method, path, query, headers) {
-    return new Promise(function(resolve, reject) {
-
-        const options = {
+Songkick.prototype.request = function (method, path, query, headers) {
+  return new Promise((resolve, reject) => {
+    const options = {
             hostname : this.HOST_NAME,
-            headers  : headers,
-            path     : url.resolve(this.PATH, path) + ( query ? '?' + querystring.stringify(query) : '' ),
+            headers,
+            path     : url.resolve(this.PATH, path) + (query ? `?${querystring.stringify(query)}` : ''),
             port     : this.port,
-            method   : method
-        };
-
-        const req = https.request(options, function(res) {
+            method
+          },
+          req = https.request(options, (res) => {
             let body = '';
 
             res.setEncoding('utf8')
-            .on('data', function(data) {
-                body += data;
+            .on('data', (data) => {
+              body += data;
             })
-            .on('end', function() {
-                resolve(body ? body : null);
+            .on('end', () => {
+              resolve(body || null);
             });
-        });
+          });
 
-        req.end();
+    req.end();
 
-        req.on('error', function(err) {
-            reject(err);
-        });
-
-    }.bind(this));
+    req.on('error', (err) => {
+      reject(err);
+    });
+  });
 };
 
 /**
  * Return the current version of the songbird api
  * @return {String}
  */
-Songkick.prototype.getApiVersion = function() {
-    return this.API_VERSION;
+Songkick.prototype.getApiVersion = function () {
+  return this.API_VERSION;
 };
 
 /**
  * Return the current version of the songbird sdk
  * @return {String}
  */
-Songkick.prototype.getClientVersion = function() {
-    return this.CLIENT_VERSION;
+Songkick.prototype.getClientVersion = function () {
+  return this.CLIENT_VERSION;
 };
 
 /**
@@ -93,20 +88,20 @@ Songkick.prototype.getClientVersion = function() {
  * @param  {Object} options
  * @return {Promise}
  */
-Songkick.prototype.findArtists = function(query, options) {
-    const queryParams = {
-        apikey   : this.API_KEY,
-        query    : query,
-        page     : 1,
-        per_page : 50
-    };
+Songkick.prototype.findArtists = function (query, options) {
+  const queryParams = {
+    apikey   : this.API_KEY,
+    query,
+    page     : 1,
+    per_page : 50
+  };
 
-    if ('undefined' !== typeof options) {
-        queryParams.page     = options.page ? options.page : queryParams.page;
-        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
-    }
+  if ('undefined' !== typeof options) {
+    queryParams.page = options.page || queryParams.page;
+    queryParams.per_page = options.perPage || queryParams.per_page;
+  }
 
-    return this.request('get', 'search/artists.json', queryParams);
+  return this.request('get', 'search/artists.json', queryParams);
 };
 
 /**
@@ -116,25 +111,25 @@ Songkick.prototype.findArtists = function(query, options) {
  * @param  {Object}  options
  * @return {Promise}
  */
-Songkick.prototype.findEvents = function(location, options) {
-    const queryParams = {
-        apikey   : this.API_KEY,
-        location : location,
-        page     : 1,
-        per_page : 50
-    };
+Songkick.prototype.findEvents = function (location, options) {
+  const queryParams = {
+    apikey   : this.API_KEY,
+    location,
+    page     : 1,
+    per_page : 50
+  };
 
-    if ('undefined' !== typeof options) {
-        queryParams.page     = options.page ? options.page : queryParams.page;
-        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
+  if ('undefined' !== typeof options) {
+    queryParams.page = options.page || queryParams.page;
+    queryParams.per_page = options.perPage || queryParams.per_page;
 
-        if (options.minDate && options.maxDate) {
-            queryParams.max_date = options.maxDate;
-            queryParams.min_date = options.minDate;
-        }
+    if (options.minDate && options.maxDate) {
+      queryParams.max_date = options.maxDate;
+      queryParams.min_date = options.minDate;
     }
+  }
 
-    return this.request('get', 'events.json', queryParams);
+  return this.request('get', 'events.json', queryParams);
 };
 
 /**
@@ -144,32 +139,30 @@ Songkick.prototype.findEvents = function(location, options) {
  * @param  {Object} options
  * @return {Promise}
  */
-Songkick.prototype.findEventsByArtist = function(artistId, options) {
-    const queryParams = {
-        apikey   : this.API_KEY,
-        page     : 1,
-        per_page : 50,
-        order    : 'asc'
-    };
+Songkick.prototype.findEventsByArtist = function (artistId, options) {
+  const queryParams = {
+    apikey   : this.API_KEY,
+    page     : 1,
+    per_page : 50,
+    order    : 'asc'
+  };
 
-    if ('undefined' !== typeof options) {
-        queryParams.page     = options.page ? options.page : queryParams.page;
-        queryParams.per_page = options.perPage ? options.perPage : queryParams.per_page;
-        queryParams.order    = options.order ? options.order : queryParams.order;
+  if ('undefined' !== typeof options) {
+    queryParams.page = options.page || queryParams.page;
+    queryParams.per_page = options.perPage || queryParams.per_page;
+    queryParams.order = options.order || queryParams.order;
 
-        if (options.minDate && options.maxDate) {
-            queryParams.max_date = options.maxDate;
-            queryParams.min_date = options.minDate;
-        }
+    if (options.minDate && options.maxDate) {
+      queryParams.max_date = options.maxDate;
+      queryParams.min_date = options.minDate;
     }
+  }
 
-    return this.request(
-        'get',
-        Number.isInteger(artistId)
-            ? 'artists/' + artistId + '/gigography.json'
-            : 'artists/mbid:' + artistId + '/gigography.json',
-        queryParams
-    );
+  return this.request('get', Number.isInteger(artistId)
+    ? `artists/${artistId}/gigography.json`
+    : `artists/mbid:${artistId}/gigography.json`,
+    queryParams
+  );
 };
 
 /**
@@ -178,12 +171,10 @@ Songkick.prototype.findEventsByArtist = function(artistId, options) {
  * @param  {Integer} artistId - Songkick artist id
  * @return {Promise}
  */
-Songkick.prototype.findSimilarArtist = function(artistId) {
-    return this.request(
-        'get',
-        'artists/' + artistId + '/gigography.json',
-        { apikey : this.API_KEY }
-    );
+Songkick.prototype.findSimilarArtist = function (artistId) {
+  return this.request('get', `artists/${artistId}/gigography.json`, {
+    apikey : this.API_KEY
+  });
 };
 
 /**
@@ -191,12 +182,10 @@ Songkick.prototype.findSimilarArtist = function(artistId) {
  * @param  {Integer} eventId
  * @return {Promise}
  */
-Songkick.prototype.getEvent = function(eventId) {
-    return this.request(
-        'get',
-        'events/' + eventId + '.json',
-        { apikey : this.API_KEY }
-    );
+Songkick.prototype.getEvent = function (eventId) {
+  return this.request('get', `events/${eventId}.json`, {
+    apikey : this.API_KEY
+  });
 };
 
 /**
@@ -204,12 +193,10 @@ Songkick.prototype.getEvent = function(eventId) {
  * @param  {Integer} venueId
  * @return {Promise}
  */
-Songkick.prototype.getVenue = function(venueId) {
-    return this.request(
-        'get',
-        'venues/' + venueId + '.json',
-        { apikey : this.API_KEY }
-    );
+Songkick.prototype.getVenue = function (venueId) {
+  return this.request('get', `venues/${venueId}.json`, {
+    apikey : this.API_KEY
+  });
 };
 
 module.exports = Songkick;
