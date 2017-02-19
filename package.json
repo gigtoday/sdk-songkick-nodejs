@@ -9,7 +9,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/gigtoday/sdk-songkick-nodejs.git"
+        "url": "git+https://github.com/matchilling/sdk-songkick-nodejs.git"
     },
     "keywords": [
         "event",
@@ -24,9 +24,9 @@
     },
     "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/gigtoday/sdk-songkick-nodejs/issues"
+        "url": "https://github.com/matchilling/sdk-songkick-nodejs/issues"
     },
-    "homepage": "https://github.com/gigtoday/sdk-songkick-nodejs#readme",
+    "homepage": "https://github.com/matchilling/sdk-songkick-nodejs#readme",
     "devDependencies": {
         "chai": "^3.5.0",
         "eslint": "^3.10.1",
